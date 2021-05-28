@@ -1,0 +1,75 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+.basic-info-form {
+  display: flex;
+  justify-content: center;
+  margin-top: 20%;
+}
+
+#cinema-hall {
+  display: flex;
+  justify-content: center;
+  margin-top: 8%;
+}
+
+.seats-info {
+  text-align: center;
+}
+
+.seats-info label {
+  display: inline-block;
+  padding-right: 3%;
+  white-space: nowrap;
+}
+.seats-info input {
+  vertical-align: middle;
+}
+.seats-info .book-btn {
+  width: 10%;
+  margin-left: 3%;
+}
+
+input[type="checkbox"] {
+  margin-right: 14px;
+  cursor: pointer;
+}
+
+input[type="checkbox"]:before {
+  content: "";
+  width: 40px;
+  height: 40px;
+  display: inline-block;
+  vertical-align: middle;
+  text-align: center;
+  border: 2px solid grey;
+  background-color: #ffffff;
+}
+
+input[type="checkbox"]:disabled::before {
+  background-color: grey;
+  border: 3px solid grey;
+}
+
+input[type="checkbox"]:checked:before {
+  background-color: orange;
+  font-size: 40px;
+}
+
+.booking-summary {
+  text-align: center;
+  margin-top: 20%;
+}
+ul {
+  list-style-type: none;
+}
