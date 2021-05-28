@@ -4,32 +4,17 @@ import React, {useEffect, useState} from 'react';
 
 
 function SummaryScreen(props) {
-
   const [myLocalStorageData, setMyLocalStorageData] = useState([])
   useEffect(() => {
-    const data = localStorage.getItem('selectedSeats').split(",");
+    const data = JSON.parse(localStorage.getItem('selectedSeats'));
     if(data !== ""){
       setMyLocalStorageData(data);
     }
     }, []);
 
-    const getSeatLocationById = (id) =>{
-      if(id.length === 3){
-        return [parseInt(id.charAt(1))+1,parseInt(id.charAt(2))+1]
-      } if(id.length === 4){
-        return [parseInt(id.charAt(1))+1,parseInt(id.charAt(2)+id.charAt(3))+1]
-      } if(id.length === 5){
-        return [parseInt(id.charAt(1)+id.charAt(2))+1,parseInt(id.charAt(3)+id.charAt(4))+1]
-      }
-      else{
-        return [0,0]
-      }
-    }
-
     const navigationHandler = () => {
       props.history.push({pathname:"/"});
     }
-  
   return (
    <div className="booking-summary">
    {myLocalStorageData.length != 0 ? <div>
@@ -38,14 +23,13 @@ function SummaryScreen(props) {
     <ul>
       {myLocalStorageData.map((seat) => {
         return(
-        <li key={seat}>- rząd {getSeatLocationById(seat)[0]}, miejsce {getSeatLocationById(seat)[1]} ({seat})</li>
+        <li key={seat.id}> - {seat.cords.x + 1} rząd, miejsce {seat.cords.y +1} , id({seat.id})</li>
       )})}
       </ul>
       <h3>Dziękujemy! W razie problemów prosimy o kontakt z działem administracji</h3>
-      <Button onClick={navigationHandler}>Rozpocznij ponownie rezerwacje</Button>
     </div> 
-    
     : <div><h1>Miejsca nie zostaly wybrane</h1></div>}
+    <Button onClick={navigationHandler}>Rozpocznij ponownie rezerwacje</Button>
    </div>
   );
 }

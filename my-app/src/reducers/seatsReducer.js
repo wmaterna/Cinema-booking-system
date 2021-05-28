@@ -5,11 +5,11 @@ function seatsListReducer(state =[ { loading: false, seats: []}], action){
         case SEATS_LIST_REQUEST:
             return {...state, loading: true, seats: []};
         case SEATS_LIST_SUCCESS:
-            return {...state, loading: true, seats: action.payload};
+            return {...state, loading: false, seats: action.payload};
         case SEATS_LIST_FAIL:
             return {...state, loading: false, error: action.payload };
-        case CONVERT_SEATS:
-            return {...state, loading: false, seats: action.payload}
+        // case CONVERT_SEATS:
+        //     return {...state, loading: false, seats: action.payload}
         default:
             return state;
     }

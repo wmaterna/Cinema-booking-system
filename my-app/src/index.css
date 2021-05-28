@@ -11,22 +11,28 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+/* WELCOME SCREEN */
 .basic-info-form {
   display: flex;
   justify-content: center;
   margin-top: 20%;
 }
+/* SEATHALL SCREEN */
+.hall-seats-contailer {
+  display: flex;
+  align-items: center;
+}
 
 #cinema-hall {
-  display: flex;
+  margin-top: 5%;
+  row-gap: 10px;
+  column-gap: 10px;
   justify-content: center;
-  margin-top: 8%;
 }
 
 .seats-info {
   text-align: center;
 }
-
 .seats-info label {
   display: inline-block;
   padding-right: 3%;
@@ -66,6 +72,7 @@ input[type="checkbox"]:checked:before {
   font-size: 40px;
 }
 
+/* SUMMARY SCREEN */
 .booking-summary {
   text-align: center;
   margin-top: 20%;

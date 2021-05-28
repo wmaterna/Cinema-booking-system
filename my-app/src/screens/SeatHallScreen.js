@@ -4,8 +4,6 @@ import { getSeatsList} from '../actions/seatsAction';
 import { Form, Button, Alert } from 'antd';
 import _ from "lodash";
 
-
-
 function SeatHallScreen(props) {
     const seatData = useSelector(state => state.seatsList);
     const dispatch = useDispatch();
@@ -13,7 +11,6 @@ function SeatHallScreen(props) {
     const [alert, setAlert] = useState(false);
     const {seatNumber, nextTo} = (props.location.state) || {};
 
-    console.log(seatNumber, nextTo)
 
     useEffect(() => {
       dispatch(getSeatsList());
@@ -24,13 +21,12 @@ function SeatHallScreen(props) {
           setSeats(proposedSeats(seatData.seats));
         }
     }, [seatData]);
-    console.log(seats)
 
     useEffect(() => {
       if(seats.length !== 0){
         seats.map((seat) => {
-          if(document.getElementById(seat) !== null){
-            document.getElementById(seat).setAttribute("checked", true);
+          if(document.getElementById(seat.id) !== null){
+            document.getElementById(seat.id).setAttribute("checked", true);
           }
         })
         setAlert(false);
@@ -38,50 +34,70 @@ function SeatHallScreen(props) {
         setAlert(true);
       }
     }, [seats])
-    
-//makes list of seats based on user input
+
+
+
 const proposedSeats = (dataArray) => {
   var seatsList = []
   var counter = 0;
+  var currentRow = dataArray[0].cords.x;
+  var currentColumn = dataArray[0].cords.y;
   if(nextTo){
-    for (var i=0; i<dataArray.length; i++){
-      for (var j=0; j<dataArray[i].length; j++){
-        if(counter < seatNumber ){
-          if(dataArray[i][j] !== 'RESERVED' && dataArray[i][j] !== 'CORRIDOR'){
-            seatsList.push(dataArray[i][j]);
+    for (var j=0; j<dataArray.length; j++) {
+      if(counter < seatNumber){
+        if(!dataArray[j].reserved){
+          if(dataArray[j].cords.x === currentRow && 
+            (dataArray[j].cords.y === currentColumn || dataArray[j].cords.y === currentColumn+1)){
             counter++;
-          } else{
-            counter = 0;
-            seatsList = []
-          }
-        } else {
-          return seatsList;
+            seatsList.push(dataArray[j]);
+            currentColumn = seatsList[seatsList.length - 1].cords.y;
+            currentRow = dataArray[j].cords.x;
+        } else{
+          seatsList = []
+          counter = 0;
+          seatsList.push(dataArray[j]);
+          counter++;
+          currentColumn = seatsList[seatsList.length - 1].cords.y;
+          currentRow = dataArray[j].cords.x;
         }
       }
-      counter = 0;
-      seatsList = []
-    }
-  } else {
-    for (var i=0; i<dataArray.length; i++){
-      for (var j=0; j<dataArray[i].length; j++){
-        if(counter<seatNumber && dataArray[i][j] !== 'RESERVED' && dataArray[i][j] !== 'CORRIDOR'){
-          seatsList.push(dataArray[i][j]);
-            counter++;
+        else{
+          seatsList = []
+          counter = 0;
+          currentColumn = dataArray[j].cords.y;
+          currentRow = dataArray[j].cords.x;
+        }
+      } else{
+        return seatsList;
       }
     }
   }
+  else {
+   for (var j=0; j<dataArray.length; j++){
+    if(dataArray[j].reserved === false && counter<seatNumber){
+      seatsList.push(dataArray[j]);
+        counter ++;
+    }
+   }
+  }
+  if(seatsList.length !== Number(seatNumber)){
+      return []
+  }
   return seatsList;
+ 
 }
-return seatsList
-}
+
 //save checked checkboxes in seats state
 const handleCheckbox = (e, item) =>{
   var checkedCheckboxes = seats;
   if(e.target.checked){
-    checkedCheckboxes.push(item);
+    const checkbox = seatData.seats.find(element => element.id === item);
+    checkedCheckboxes.push(checkbox);
   } else{
-    if(checkedCheckboxes.includes(item)){
-      const index = checkedCheckboxes.indexOf(item);
+    if(checkedCheckboxes.some(element => element.id === item)){
+      const index = checkedCheckboxes.findIndex((element) => {
+        return element.id === item;
+      });
       if(index > -1){
         checkedCheckboxes.splice(index, 1);
       }
@@ -89,30 +105,26 @@ const handleCheckbox = (e, item) =>{
     setSeats(checkedCheckboxes);
   }
 }
+
 const handleSubmit = () => {
-  localStorage.setItem('selectedSeats', seats);
+  localStorage.setItem('selectedSeats', JSON.stringify(seats));
   props.history.push("/summary");
 }
 
 //generates net of seats in cinema hall
 const seatsGenerator = (prepareData) => {
+    const rowsNumber = Math.max.apply(Math, seatData.seats.map(function(e) { return e.cords.y; })) + 1;
+    const columnsNumber = Math.max.apply(Math, seatData.seats.map(function(e) { return e.cords.x; })) + 1;
     return(
-      <table id="cinema-hall">
-      <thead>
-      </thead>
-        <tbody>
-          {seatData.seats.map((row, index_row) => {
-            return(
-            <tr key={index_row}>
-            {row.map((column, index_column) => {
-             return(
-              column==='RESERVED' ? <td key={index_column}><input type="checkbox" disabled={true} id={column} value={column} style={{width: "40px", height: "40px"}}/></td> :
-              column==='CORRIDOR' ? <td key={index_column} style={{color: "white"}}>cor</td> :
-               <td  key={index_column}><input type="checkbox" id={column} value={column} style={{width: "40px", height: "40px"}} onClick={(e)=> handleCheckbox(e, e.target.id)} /></td>) 
-            } )}</tr>)
-            })}
-        </tbody>
-      </table>
+      <div id="cinema-hall" style={{display: "grid", gridTemplateColumns: `repeat(${rowsNumber}, 40px)`, gridTemplateRows: `repeat(${columnsNumber}, 40px) `, }}>
+        {seatData.seats.map((seat) => {
+          return(<div style={{gridColumnStart: seat.cords.y + 1, gridColumnEnd: seat.cords.y + 2, gridRowStart: seat.cords.x + 1, gridRowEnd: seat.cords.x + 2 }}>
+          {seat.reserved ? <input type="checkbox" id={seat.id} disabled={true} style={{width: "40px", height: "40px"}} /> : 
+          <input type="checkbox" id={seat.id} disabled={false} onClick={(e) => handleCheckbox(e, e.target.id)} style={{width: "40px", height: "40px"}} />}
+        </div>)
+        })
+        }
+      </div>
     )
 }
 
@@ -126,7 +138,7 @@ const seatsGenerator = (prepareData) => {
       closable
     /> : <div></div>}
     <Form>
-      <Form.Item>
+      <Form.Item className="hall-seats-contailer">
         {seatsGenerator()}
       </Form.Item>
       <Form.Item className="seats-info">
