@@ -36,7 +36,7 @@ function SeatHallScreen(props) {
     }, [seats])
 
 
-
+//list of seats that are in the same line, not reserved no corridor between any of them
 const proposedSeats = (dataArray) => {
   var seatsList = []
   var counter = 0;
@@ -86,7 +86,6 @@ const proposedSeats = (dataArray) => {
   return seatsList;
  
 }
-
 //save checked checkboxes in seats state
 const handleCheckbox = (e, item) =>{
   var checkedCheckboxes = seats;
@@ -111,7 +110,7 @@ const handleSubmit = () => {
   props.history.push("/summary");
 }
 
-//generates net of seats in cinema hall
+//generate net of seats based on grid layout
 const seatsGenerator = (prepareData) => {
     const rowsNumber = Math.max.apply(Math, seatData.seats.map(function(e) { return e.cords.y; })) + 1;
     const columnsNumber = Math.max.apply(Math, seatData.seats.map(function(e) { return e.cords.x; })) + 1;
